@@ -4,7 +4,9 @@ import asyncio
 import time
 from .models import CarDealer, DealerReview
 # import related models here
-from requests.auth import HTTPBasicAuth
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 
 
 # Create a `get_request` to make HTTP GET requests
@@ -30,7 +32,6 @@ def get_request(url, **kwargs):
     status_code =  response.status_code
     print("With status {} ".format(status_code))
     json_data = json.loads(response.text)
-    print(json_data)
   
     return json_data
 
@@ -84,6 +85,8 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                                       review=review_doc["review"], purchase_date=review_doc["purchase_date"],
                                       car_make=review_doc["car_make"], car_model=review_doc["car_model"],
                                       car_year=review_doc["car_year"])
+            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
+
             results.append(review_obj)
 
     return results
@@ -92,6 +95,19 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
+def analyze_review_sentiments(dealer_review):
+    api_key = "R2s8l7dCGcgjSp4Z_Gl7CmUEOc0QBu3HXKQZzGYIvcJY"
+    url = "https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/edf934c8-ce9b-4edf-8489-f0a3e3b35c38"
+    authenticator = IAMAuthenticator(api_key)
+    NLU = NaturalLanguageUnderstandingV1(
+                                        version='2022-04-07',
+                                        authenticator=authenticator)
+    NLU.set_service_url(url)
+    response = NLU.analyze(text=dealer_review, features=Features(sentiment= SentimentOptions()), language= "en")
+    sentiment = response.result["sentiment"]["document"]["label"]
+    return sentiment
+
+
 
 
 

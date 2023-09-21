@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 import asyncio
 # from .models import related models
 # from .restapis import related methods
-from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf
+from .restapis import get_dealers_from_cf, get_dealer_reviews_from_cf, post_request
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -112,4 +112,29 @@ def get_dealer_details(request, dealer_id):
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
+def add_review(request):
+    url = "https://us-south.functions.appdomain.cloud/api/v1/web/7b4c0a85-5334-4549-aea8-89db1bd7b507/dealership-package/review"
 
+     # Get username and password from request.POST dictionary
+    # username = request.POST['username']
+    # password = request.POST['psw']
+    # # Try to check if provide credential can be authenticated
+    # user = authenticate(username=username, password=password)
+    # if user is not None:
+    review = dict()
+    json_payload = dict()
+    review["id"] = 12
+    review["dealership"] = 15 
+    review["name"] = "Taha Qazi"
+    review["car_make"] = "Toyota" 
+    review["car_model"] = "Camry"
+    review["car_year"] = 2021
+    review["purchase"] = False
+    review["purchase_date"] = datetime.utcnow().date
+    review["review"] = "This place smells like horse manure "
+    json_payload["review"] = review
+    response = post_request(url, json_payload)
+    return HttpResponse(response)
+
+
+    

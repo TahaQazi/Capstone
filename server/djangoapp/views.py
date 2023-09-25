@@ -121,6 +121,7 @@ def add_review(request):
     # # Try to check if provide credential can be authenticated
     # user = authenticate(username=username, password=password)
     # if user is not None:
+
     review = dict()
     json_payload = dict()
     review["id"] = 12
@@ -130,7 +131,7 @@ def add_review(request):
     review["car_model"] = "Camry"
     review["car_year"] = 2021
     review["purchase"] = False
-    review["purchase_date"] = datetime.utcnow().date
+    review["purchase_date"] = str(datetime.utcnow().date)
     review["review"] = "This place smells like horse manure "
     json_payload["review"] = review
     response = post_request(url, json_payload)
